@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ErrorResponse><Error><Type>Sender</Type><Code>AuthFailure</Code><Message>The provided signature is not valid for this access token</Message><Detail/></Error><RequestId>ef3aba6a-dc84-4937-91bf-cef2ddd6775a</RequestId></ErrorResponse>
