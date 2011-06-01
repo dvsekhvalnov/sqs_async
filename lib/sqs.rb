@@ -12,17 +12,63 @@ require 'em-http-request'
 require 'sqs_message'
 require 'sqs_queue'
 require 'sqs_attributes'
+require 'sqs_utilities'
+require 'core_ext/hash'
 require 'logger'
 
 module SQS
+  include SQS::Utilities
+
   attr_accessor :aws_key, :aws_secret, :regions, :default_parameters, :post_options
+
+  def change_message_visibility
+    raise "Not Implemented Yet."
+  end
+
+  def set_queue_attributes
+    raise "Not Implemented Yet."
+  end
+
+  def send_message
+    raise "Not Implemented Yet."
+  end
+
+  def add_permission(options={})
+    raise "no target queue specified" unless options[:queue]
+    raise "no permissions objects specified" unless options[:permissions]
+
+    [options[:permissions]].flatten.each_with_index do |perm, index|
+      ordinal = index+1
+      options.merge!(perm.to_params(ordinal)) # last label wins.
+    end
+
+    options.delete(:permissions)
+    options.merge!( :action => "AddPermission" )
+
+    call_amazon(options)
+  end
+
+  def remove_permission(options={})
+    raise "no target queue specified" unless options[:queue]
+    raise "no permissions objects specified" unless options[:permissions]
+
+    [options[:permissions]].flatten.each_with_index do |perm, index|
+      ordinal = index+1
+      options.merge!(perm.to_params(ordinal)) # last label wins.
+    end
+
+    options.delete(:permissions)
+    options.merge!( :action => "RemovePermission" )
+
+    call_amazon(options)
+  end
 
   def list_queues(options={})
     prefix = options.delete(:prefix)
     match = options.delete(:match)
 
-    options.merge!( "Action" => "ListQueues" )
-    options.merge!( "QueueNamePrefix" => encode(prefix) ) if prefix
+    options.merge!( :action => "ListQueues" )
+    options.merge!( :queue_name_prefix => encode(prefix) ) if prefix
 
     call_amazon(options) do |req|
       queues = SQSQueue.parse(req.response)
@@ -33,20 +79,35 @@ module SQS
 
   def receive_message(options={})
     raise "no target queue specified" unless options[:queue]
-    options.merge!("Action" => "ReceiveMessage", "MaxNumberOfMessages" => 10 )
+    options = { :max_number_of_messages => 10 }.merge(options)
+    options.merge!(:action => "ReceiveMessage")
     call_amazon(options){ |req| SQSMessage.parse(req.response) }
   end
 
   def delete_message(options={})
     raise "no Message specified" unless options[:message]
-    options.merge!("Action" => "DeleteMessage", "ReceiptHandle" => options.delete(:message).receipt_handle)
+    options.merge!(:action => "DeleteMessage", :receipt_handle => options.delete(:message).receipt_handle)
     call_amazon(options)
   end
 
   def get_queue_attributes(options={})
     raise "no target queue specified" unless options[:queue]
-    options.merge!( "Action" => "GetQueueAttributes", "AttributeName" => "All" )
+    options = {:attribute_name => "All" }.merge(options)
+    options.merge!(:action => "GetQueueAttributes")
     call_amazon(options){ |req| SQSAttributes.parse(req.response) }
+  end
+
+  def delete_queue(options={})
+    raise "no target queue specified" unless options[:queue]
+    options.merge!( :action => "DeleteQueue")
+    call_amazon(options)
+  end
+
+  def create_queue(options={})
+    raise "no queue name specified" unless options[:queue_name]
+    options[:default_visibility_timeout] = 30 unless options[:default_visibility_timeout]
+    options.merge!( :action => "CreateQueue" )
+    call_amazon(options){ |req| SQSQueue.parse(req.response) }
   end
 
   private
@@ -55,6 +116,7 @@ module SQS
       endpoint = (options[:queue] != nil) ? options.delete(:queue).queue_url : "http://" << ( options.delete(:host) || region_host(:us_east) )
       callbacks = options.delete(:callbacks) || {:success=>nil, :failure =>nil }
 
+      options.amazonize_keys!
       params = sign_params( endpoint, options )
       req = EM::HttpRequest.new("#{endpoint}?#{params}").get
       req.callback do |req|

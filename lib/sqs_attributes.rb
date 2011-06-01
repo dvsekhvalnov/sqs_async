@@ -2,8 +2,11 @@ require 'nokogiri'
 require 'json'
 require 'base64'
 require 'ostruct'
+require 'sqs_utilities'
 
 class SQSAttributes
+  extend SQS::Utilities
+
   attr_accessor :approximate_number_of_messages,
     :approximate_number_of_messages_not_visible,
     :visibility_timeout,
@@ -26,13 +29,4 @@ class SQSAttributes
     queue_data
   end
 
-  # Taken from ActiveSupport. License information can be found at rubyonrails.org
-  def self.underscore(camel_cased_word)
-    word = camel_cased_word.to_s.dup
-    word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
-    word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
-    word.tr!("-", "_")
-    word.downcase!
-    word
-  end
 end

@@ -1,7 +1,7 @@
 ENV["BUBBLE_ENV"] = "test"
 
 $:.unshift(File.dirname(__FILE__))
-%w{ ../ lib config vendor/sqs_async/lib }.each do |d|
+%w{ ../ lib config vendor/sqs_async/lib lib/core_ext }.each do |d|
   $:.unshift(File.dirname(__FILE__)+"/#{d}/")
 end
 
@@ -10,11 +10,7 @@ require 'rspec'
 require 'timecop'
 require 'em-http-request'
 
-require 'sqs'
-require 'sqs_message'
-require 'sqs_queue'
-require 'sqs_attributes'
-
+require 'sqs_async'
 
 RSpec.configure do |config|
   config.mock_framework = :mocha

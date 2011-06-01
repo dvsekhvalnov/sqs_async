@@ -46,6 +46,24 @@ describe "SQS" do
   end
 
   context "calls Amazon Endpoints asynchronously to" do
+
+    it "change_message_visibility"
+    it "set_queue_attributes"
+    it "send_message"
+
+    it "creates a queue" do
+      client.create_queue(
+        :queue_name => "testQueue",
+        :callbacks => {
+          :success => lambda{|queues|
+            queues.length.should == 1
+            queues.first.queue_url.to_s.should == "http://sqs.us-east-1.amazonaws.com/123456789012/testQueue"
+          }
+        }
+      )
+      EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:create_queue)))
+    end
+
     it "list available queues" do
       client.list_queues(
         :callbacks => {
@@ -56,6 +74,44 @@ describe "SQS" do
         }
       )
       EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:list_queues)))
+    end
+
+    context "permissions management" do
+      let(:permissions) do
+        leon = SQSPermission.new
+        leon.aws_account_id = "a12digitcode"
+        leon.permission = SQS::Permissions::All
+
+        john = SQSPermission.new
+        john.aws_account_id = "b12digitcode"
+        john.permission = SQS::Permissions::SendMessage
+
+        [leon, john]
+      end
+
+      let(:mock_closure) do
+        mock_closure = mock()
+        mock_closure.expects(:call).once
+        mock_closure
+      end
+
+      it "adds permissions to a queue" do
+        client.add_permission(
+          :queue => queue,
+          :permissions => permissions,
+          :callbacks => { :success => mock_closure }
+        )
+        EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:add_permission)))
+      end
+
+      it "adds permissions to a queue" do
+        client.remove_permission(
+          :queue => queue,
+          :permissions => permissions,
+          :callbacks => { :success => mock_closure }
+        )
+        EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:remove_permission)))
+      end
     end
 
     it "pull a message from the queue" do
