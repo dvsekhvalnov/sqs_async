@@ -8,5 +8,6 @@ require 'sqs_attributes'
 require 'sqs_message'
 require 'sqs_queue'
 require 'sqs_permission'
+require 'sqs_send_message_response'
 
 require 'core_ext/hash'

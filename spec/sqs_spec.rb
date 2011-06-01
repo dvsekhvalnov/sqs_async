@@ -60,7 +60,36 @@ describe "SQS" do
     end
 
     it "set_queue_attributes"
-    it "send_message"
+    context "putting a message on the queue" do
+      it "send_message with SQSMessage object" do
+        msg = SQSMessage.new
+        msg.body = "foo"
+        client.send_message(
+          :queue => queue,
+          :message => msg, 
+          :callbacks => { 
+            :success => lambda { |sqs_message_obj|
+              sqs_message_obj.body.should == "foo"
+              sqs_message_obj.md5_of_body.should_not be_nil
+            }
+          }
+        )
+        EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:send_message)))
+      end
+      it "send_message with message body" do
+        client.send_message(
+          :queue => queue,
+          :message_body => "foo",
+          :callbacks => {
+            :success => lambda { |sqs_message_obj|
+              sqs_message_obj.body.should == "foo"
+              sqs_message_obj.md5_of_body.should_not be_nil
+            }
+          }
+        )
+        EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:send_message)))
+      end
+    end
 
     it "creates a queue" do
       client.create_queue(

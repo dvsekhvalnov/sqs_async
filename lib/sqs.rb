@@ -35,7 +35,11 @@ module SQS
   end
 
   def send_message(options={})
-    raise "Not Implemented Yet."
+    raise "no object(:message) or string(:message_body) specified" unless (options[:message] || options[:message_body])
+    options.merge!( :message_body => options.delete(:message).body ) if options[:message]
+    body = options[:message_body]
+
+    call_amazon(options){ |req| SQSSendMessageResponse.parse(body, req.response) }
   end
 
   def add_permission(options={})
