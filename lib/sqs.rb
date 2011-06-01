@@ -21,15 +21,20 @@ module SQS
 
   attr_accessor :aws_key, :aws_secret, :regions, :default_parameters, :post_options
 
-  def change_message_visibility
+  def change_message_visibility(options={})
+    raise "no Message specified" unless options[:message]
+    raise "no new visibility_timeout specified" unless options[:visibility_timeout]
+    options.merge!(:action => "ChangeMessageVisibility",
+                   :receipt_handle => options.delete(:message).receipt_handle,
+                   :visibility_timeout => options.delete(:visibility_timeout).to_i)
+    call_amazon(options)
+  end
+
+  def set_queue_attributes(options={})
     raise "Not Implemented Yet."
   end
 
-  def set_queue_attributes
-    raise "Not Implemented Yet."
-  end
-
-  def send_message
+  def send_message(options={})
     raise "Not Implemented Yet."
   end
 

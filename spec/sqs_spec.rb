@@ -47,7 +47,18 @@ describe "SQS" do
 
   context "calls Amazon Endpoints asynchronously to" do
 
-    it "change_message_visibility"
+    it "change_message_visibility" do
+      mock_obj = mock();
+      mock_obj.expects(:call).once
+      client.change_message_visibility(
+        :queue => queue,
+        :message => message,
+        :visibility_timeout => Time.now.to_i + (30*60),
+        :callbacks => { :success => mock_obj }
+      )
+      EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:change_message_visibility)))
+    end
+
     it "set_queue_attributes"
     it "send_message"
 
