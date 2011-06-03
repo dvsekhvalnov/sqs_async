@@ -1,9 +1,5 @@
 ENV["BUBBLE_ENV"] = "test"
-
-$:.unshift(File.dirname(__FILE__))
-%w{ ../ lib lib/sqs_async lib/sqs_async/core_ext }.each do |d|
-  $:.unshift(File.dirname(__FILE__)+"/#{d}/")
-end
+$:.unshift(File.dirname(__FILE__)+"/lib/")
 
 require 'bundler/setup'
 require 'rspec'

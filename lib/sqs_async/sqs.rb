@@ -10,6 +10,10 @@ require 'json'
 require 'eventmachine'
 require 'em-http-request'
 require 'logger'
+require 'sqs_async/sqs_utilities'
+require 'sqs_async/sqs_message'
+require 'sqs_async/sqs_attributes'
+require 'sqs_async/sqs_queue'
 
 module SQS
   include SQS::Utilities
