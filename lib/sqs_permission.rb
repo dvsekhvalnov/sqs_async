@@ -1,30 +1,27 @@
 module SQS
   module Permissions
-    All                     = "*"
-    SendMessage             = "SendMessage"
-    ReceiveMessage          = "ReceiveMessage"
-    DeleteMessage           = "DeleteMessage"
-    ChangeMessageVisibility = "ChangeMessageVisibility"
-    GetQueueAttributes      = "GetQueueAttributes"
-
-    def send_message
-      SendMessage
+    def self.all
+      "*"
     end
 
-    def receive_message
-      ReceiveMessage
+    def self.send_message
+      "SendMessage"
     end
 
-    def delete_message
-      DeleteMessage
+    def self.receive_message
+      "ReceiveMessage"
     end
 
-    def change_message_visibility
-      ChangeMessageVisibility
+    def self.delete_message
+      "DeleteMessage"
     end
 
-    def get_queue_attributes
-      GetQueueAttributes
+    def self.change_message_visibility
+      "ChangeMessageVisibility"
+    end
+
+    def self.get_queue_attributes
+      "GetQueueAttributes"
     end
   end
 end

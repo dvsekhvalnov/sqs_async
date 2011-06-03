@@ -38,6 +38,33 @@ is a hash of callbacks. Currently supported are :success and :failure. You can a
 
     client.list_queues( :success => lambda {|queues| puts queues } )
 
+# Known Issues
+
+At the moment, there is very little validation. So, it's important to validate your
+data prior to placing submitting it to Amazon. Some bits that are important to the
+success of sending a message (for example) are validated (signatures, keys, etc) but
+items like Policies on set_queue_attributes are assumed "good" by the time you pass it in.
+
+This is something that will be added in a future release... Stay Tuned or get your patch on. :)
+
+# Changes
+
+## 0.0.2
+Implicit evaluation of expected actions
+Base implementations of all SQS API methods.
+
+## 0.0.1
+Initial release. Only 3 endpoints supported.
+
+# Long Term Goals
+* Global Error Handling
+* Include Message/AWS specific meta-data to response objects.
+* Async support for other services in the AWS stack.
+* Allow for drop-in alternatives to EventMachine
+
+# Not interested in implementing...
+* Backwards compatibility with past AWS APIs.
+
 # Fork it.
 
 We love to write and maintain code but there are only so many hours in a day! :) We encourage others to pick up where we left off and issue pull

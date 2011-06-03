@@ -18,20 +18,26 @@ require 'logger'
 
 module SQS
   include SQS::Utilities
-
   attr_accessor :aws_key, :aws_secret, :regions, :default_parameters, :post_options
 
   def change_message_visibility(options={})
     raise "no Message specified" unless options[:message]
     raise "no new visibility_timeout specified" unless options[:visibility_timeout]
-    options.merge!(:action => "ChangeMessageVisibility",
-                   :receipt_handle => options.delete(:message).receipt_handle,
-                   :visibility_timeout => options.delete(:visibility_timeout).to_i)
+    options.merge!( :receipt_handle => options.delete(:message).receipt_handle,
+                    :visibility_timeout => options.delete(:visibility_timeout).to_i)
     call_amazon(options)
   end
 
   def set_queue_attributes(options={})
-    raise "Not Implemented Yet."
+    raise "no target queue specified" unless options[:queue]
+    %w[ :visibility_timeout :policy :maximum_message_size :message_retention_period ].each do |attr_type|
+      if options[attr_type]
+        val = options.delete(attr_type)
+        options.merge! "Attribute.Name" => camelize(attr_type), "Attribute.Value" => val
+      end
+    end
+
+    call_amazon(options)
   end
 
   def send_message(options={})
@@ -52,7 +58,6 @@ module SQS
     end
 
     options.delete(:permissions)
-    options.merge!( :action => "AddPermission" )
 
     call_amazon(options)
   end
@@ -67,7 +72,6 @@ module SQS
     end
 
     options.delete(:permissions)
-    options.merge!( :action => "RemovePermission" )
 
     call_amazon(options)
   end
@@ -76,7 +80,6 @@ module SQS
     prefix = options.delete(:prefix)
     match = options.delete(:match)
 
-    options.merge!( :action => "ListQueues" )
     options.merge!( :queue_name_prefix => encode(prefix) ) if prefix
 
     call_amazon(options) do |req|
@@ -89,33 +92,29 @@ module SQS
   def receive_message(options={})
     raise "no target queue specified" unless options[:queue]
     options = { :max_number_of_messages => 10 }.merge(options)
-    options.merge!(:action => "ReceiveMessage")
     call_amazon(options){ |req| SQSMessage.parse(req.response) }
   end
 
   def delete_message(options={})
     raise "no Message specified" unless options[:message]
-    options.merge!(:action => "DeleteMessage", :receipt_handle => options.delete(:message).receipt_handle)
+    options.merge!(:receipt_handle => options.delete(:message).receipt_handle)
     call_amazon(options)
   end
 
   def get_queue_attributes(options={})
     raise "no target queue specified" unless options[:queue]
     options = {:attribute_name => "All" }.merge(options)
-    options.merge!(:action => "GetQueueAttributes")
     call_amazon(options){ |req| SQSAttributes.parse(req.response) }
   end
 
   def delete_queue(options={})
     raise "no target queue specified" unless options[:queue]
-    options.merge!( :action => "DeleteQueue")
     call_amazon(options)
   end
 
   def create_queue(options={})
     raise "no queue name specified" unless options[:queue_name]
     options[:default_visibility_timeout] = 30 unless options[:default_visibility_timeout]
-    options.merge!( :action => "CreateQueue" )
     call_amazon(options){ |req| SQSQueue.parse(req.response) }
   end
 
@@ -125,21 +124,24 @@ module SQS
       endpoint = (options[:queue] != nil) ? options.delete(:queue).queue_url : "http://" << ( options.delete(:host) || region_host(:us_east) )
       callbacks = options.delete(:callbacks) || {:success=>nil, :failure =>nil }
 
+      if( who_called_us = caller(0)[1] )
+        options = {:action => action_from_caller(who_called_us)}.merge(options)
+      end
+
       options.amazonize_keys!
+
       params = sign_params( endpoint, options )
       req = EM::HttpRequest.new("#{endpoint}?#{params}").get
-      req.callback do |req|
-        if(req.response.to_s.match(/<ErrorResponse>/i))
-           on_failure(req, callbacks)
+      req.callback do |req_ref|
+        if(req_ref.response.to_s.match(/<ErrorResponse>/i))
+           on_failure(req_ref, callbacks)
         else
-          result = req
-          result = yield req if block_given?
+          result = req_ref
+          result = yield req_ref if block_given?
           callbacks[:success].call(result) if callbacks[:success]
         end
       end
-      req.errback do |req|
-        on_failure(req, callbacks)
-      end
+      req.errback { |req_ref| on_failure(req_ref, callbacks) }
     end
 
     def on_failure(req, callbacks)
@@ -169,7 +171,7 @@ module SQS
     end
 
     def encoding_exclusions
-      /[^\w\d\-\_\.\~]/
+      /[^\w\d\-_\.~]/
     end
 
     def encode(val)
@@ -181,17 +183,17 @@ module SQS
     end
 
     def regions
-      @regions ||= Regions
+      @regions ||= REGIONS
       @regions
     end
 
     def default_paramters
-      @default_paramters ||= Parameters.merge("AWSAccessKeyId" => aws_key)
+      @default_paramters ||= PARAMETERS.merge("AWSAccessKeyId" => aws_key)
       @default_paramters.merge("Expires" => (Time.now+(60*30)).utc.iso8601)
     end
 
     def post_options
-      @post_options ||= PostOptions
+      @post_options ||= POSTOPTIONS
       @post_options
     end
 
@@ -212,7 +214,7 @@ module SQS
       logger.error(log_msg.join("\n"))
     end
 
-    Regions = {
+    REGIONS = {
       :us_east => { :name => "US-East (Northern Virginia) Region", :uri  => "sqs.us-east-1.amazonaws.com"},
       :us_west => { :name => "US-West (Northern California) Region", :uri  => "sqs.us-west-1.amazonaws.com"},
       :eu => { :name => "EU (Ireland) Region", :uri  => "sqs.eu-west-1.amazonaws.com"},
@@ -221,13 +223,13 @@ module SQS
     }
 
 
-    Parameters = {
+    PARAMETERS = {
       "Version" => "2009-02-01",
       "SignatureVersion"=>"2",
       "SignatureMethod"=>"HmacSHA256",
     }
 
-    PostOptions = {
+    POSTOPTIONS = {
       "Content-Type" => "application/x-www-form-urlencoded"
     }
 end

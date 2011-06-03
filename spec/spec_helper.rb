@@ -28,11 +28,11 @@ module EventMachine
     end
 
     def get *args
-      return self
+      self
     end
 
     def post *args
-      return self
+      self
     end
 
     def callback &block

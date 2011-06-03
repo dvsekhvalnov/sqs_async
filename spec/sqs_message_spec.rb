@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "SQSMessage" do
-  describe ".parse" do
+  context ".parse" do
     let(:messages) { SQSMessage.parse(xml_fixture(:receive_message)) }
 
     it "returns SQSMessage objects" do

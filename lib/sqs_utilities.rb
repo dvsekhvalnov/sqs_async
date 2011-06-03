@@ -4,7 +4,11 @@
 module SQS
   module Utilities
 
-    def camelize(str, first_letter_in_uppercase = true)
+    def action_from_caller(first_element_in_caller)
+      camelize(first_element_in_caller.scan(/\`(\w+)\'/).flatten.first)
+    end
+
+    def camelize(str)
       str.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
     end
 

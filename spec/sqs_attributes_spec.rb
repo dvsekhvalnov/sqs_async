@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "SQSAttributes" do
-  describe ".parse" do
+  context ".parse" do
     let(:attributes_obj) { SQSAttributes.parse(xml_fixture(:queue_attributes)) }
 
     it "returns SQSAttributes objects" do

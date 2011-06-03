@@ -48,7 +48,7 @@ describe "SQS" do
   context "calls Amazon Endpoints asynchronously to" do
 
     it "change_message_visibility" do
-      mock_obj = mock();
+      mock_obj = mock()
       mock_obj.expects(:call).once
       client.change_message_visibility(
         :queue => queue,
@@ -59,7 +59,17 @@ describe "SQS" do
       EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:change_message_visibility)))
     end
 
-    it "set_queue_attributes"
+    it "set_queue_attributes" do
+      mock_obj = mock()
+      mock_obj.expects(:call).once
+      client.set_queue_attributes(
+          :queue => queue,
+          :visibility_timeout => Time.now.to_i + (30*60),
+          :callbacks => { :success => mock_obj }
+      )
+      EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:set_queue_attributes)))
+    end
+
     context "putting a message on the queue" do
       it "send_message with SQSMessage object" do
         msg = SQSMessage.new
@@ -76,6 +86,7 @@ describe "SQS" do
         )
         EM::HttpRequest.succeed(EM::MockResponse.new(xml_fixture(:send_message)))
       end
+
       it "send_message with message body" do
         client.send_message(
           :queue => queue,
@@ -120,11 +131,11 @@ describe "SQS" do
       let(:permissions) do
         leon = SQSPermission.new
         leon.aws_account_id = "a12digitcode"
-        leon.permission = SQS::Permissions::All
+        leon.permission = SQS::Permissions.all
 
         john = SQSPermission.new
         john.aws_account_id = "b12digitcode"
-        john.permission = SQS::Permissions::SendMessage
+        john.permission = SQS::Permissions.send_message
 
         [leon, john]
       end
@@ -171,7 +182,7 @@ describe "SQS" do
     end
 
     it "delete a message from the queue" do
-      mock_obj = mock();
+      mock_obj = mock()
       mock_obj.expects(:call).once
       client.delete_message(
         :queue => queue,

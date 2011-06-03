@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'sqs_message'
 
 describe "SQSQueue" do
-  describe ".parse" do
+  context ".parse" do
     let(:queues) { SQSQueue.parse(xml_fixture(:list_queues)) }
 
     it "returns SQSQueue objects" do
