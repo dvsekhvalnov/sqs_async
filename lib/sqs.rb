@@ -9,11 +9,6 @@ require 'nokogiri'
 require 'json'
 require 'eventmachine'
 require 'em-http-request'
-require 'sqs_message'
-require 'sqs_queue'
-require 'sqs_attributes'
-require 'sqs_utilities'
-require 'core_ext/hash'
 require 'logger'
 
 module SQS

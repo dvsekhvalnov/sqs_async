@@ -2,7 +2,6 @@ require 'nokogiri'
 require 'json'
 require 'base64'
 require 'ostruct'
-require 'sqs_utilities'
 
 class SQSAttributes
   extend SQS::Utilities

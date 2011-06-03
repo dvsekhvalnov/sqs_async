@@ -3,12 +3,16 @@ $:.unshift(File.dirname(__FILE__))
   $:.unshift(File.dirname(__FILE__)+"/#{d}/")
 end
 
-require 'sqs'
+# Core extensions and global mixins
+require 'core_ext/hash'
 require 'sqs_utilities'
-require 'sqs_attributes'
-require 'sqs_message'
+
+# App classes and modules
 require 'sqs_queue'
+require 'sqs_message'
+require 'sqs_attributes'
 require 'sqs_permission'
 require 'sqs_send_message_response'
 
-require 'core_ext/hash'
+# main app module
+require 'sqs'
