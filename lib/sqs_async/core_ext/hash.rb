@@ -1,4 +1,4 @@
-require 'sqs_utilities'
+require 'sqs_async/sqs_utilities'
 
 class Hash
   include SQS::Utilities

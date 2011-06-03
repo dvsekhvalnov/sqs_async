@@ -1,7 +1,7 @@
 require 'rake'
 Gem::Specification.new do |s|
   s.name = 'sqs_async'
-  s.version = '0.0.4'
+  s.version = '0.0.5'
   s.summary = 'Non-Blocking SQS library.'
   s.description = 'A simple library that leverages Event Machine to issue requests to the Amazon SQS service while blocking as little as possible'
   s.authors = "EdgeCase <contact@edgecase.com>", "John Andrews <john@edgecase.com>", "Leon Gersing <leon@edgecase.com>"
@@ -21,8 +21,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'timecop'
 
-  s.files         = FileList.new('lib/*.rb')
+  s.files         = FileList.new('lib/**/*.rb')
   s.test_files    = FileList.new('spec/**/*')
-  s.require_paths = ["lib"]
+  s.require_paths = [ "lib", "lib/sqs_async", "lib/sqs_async/core_ext" ]
 end
 

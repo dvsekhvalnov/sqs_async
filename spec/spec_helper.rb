@@ -1,7 +1,7 @@
 ENV["BUBBLE_ENV"] = "test"
 
 $:.unshift(File.dirname(__FILE__))
-%w{ ../ lib config vendor/sqs_async/lib lib/core_ext }.each do |d|
+%w{ ../ lib lib/sqs_async lib/sqs_async/core_ext }.each do |d|
   $:.unshift(File.dirname(__FILE__)+"/#{d}/")
 end
 

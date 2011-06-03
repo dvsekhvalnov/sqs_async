@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'sqs_message'
 
 describe "SQSQueue" do
   context ".parse" do
