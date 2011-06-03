@@ -1,4 +1,5 @@
-%w{ ./ lib }.each do |d|
+$:.unshift(File.dirname(__FILE__))
+%w{ lib lib/core_ext }.each do |d|
   $:.unshift(File.dirname(__FILE__)+"/#{d}/")
 end
 
