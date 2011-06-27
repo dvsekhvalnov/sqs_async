@@ -1,7 +1,7 @@
 require 'rake'
 Gem::Specification.new do |s|
   s.name = 'sqs_async'
-  s.version = '0.0.6'
+  s.version = '0.0.7'
   s.summary = 'Non-Blocking SQS library.'
   s.description = 'A simple library that leverages Event Machine to issue requests to the Amazon SQS service while blocking as little as possible'
   s.authors = "EdgeCase <contact@edgecase.com>", "John Andrews <john@edgecase.com>", "Leon Gersing <leon@edgecase.com>"
