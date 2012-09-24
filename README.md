@@ -1,4 +1,8 @@
 # SQS Async
+
+## Changelog:
+Fixed error handling defect to correctly recognize SQS REST API errors.
+
 ## A (mostly) non-blocking Amazon SQS client
 
 The goal of this library is simple. For those of us needing a way to communicate with SQS 
