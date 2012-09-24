@@ -133,7 +133,7 @@ module SQS
       params = sign_params( endpoint, options )
       req = EM::HttpRequest.new("#{endpoint}?#{params}").get
       req.callback do |req_ref|
-        if(req_ref.response.to_s.match(/<ErrorResponse>/i))
+        if(req_ref.response.to_s.match(/<ErrorResponse/i))
            on_failure(req_ref, callbacks)
         else
           result = req_ref
