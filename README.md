@@ -2,6 +2,20 @@
 
 ## Changelog:
 Fixed error handling defect to correctly recognize SQS REST API errors.
+Updated to latest 2012-11-05 API version
+Added parsing for well-known SQS attributes, e.g.:
+
+	class MySQSClient
+	  include SQS        
+	end
+	client = MySQSClient.new
+	
+	client.receive_message(:attribute => "All",
+			   :callbacks => {
+					:success => lambda { |msgs| puts "#{msgs[0].attributes[:approximate_receive_count]}" }
+				}
+
+, see sqs_message_spec.rb for details.
 
 ## A (mostly) non-blocking Amazon SQS client
 

@@ -33,8 +33,8 @@ describe "SQS" do
     end
 
     it "signs requests prior to sending" do
-      Timecop.freeze(Time.parse("2011-04-20T00:00:00")) do
-        client.sign_params("http://edgecase.com/mysevice", {}).should == "AWSAccessKeyId=adsf&Expires=2011-04-20T04%3A30%3A00Z&SignatureMethod=HmacSHA256&SignatureVersion=2&Version=2009-02-01&Signature=oKFwSahHQIMKiSOabVZqwcZEFowOdqyyj2gamyjJ3oU%3D"
+      Timecop.freeze(Time.parse("2011-04-20T00:00:00 UTC")) do
+        client.sign_params("http://edgecase.com/mysevice", {}).should == "AWSAccessKeyId=adsf&Expires=2011-04-20T00%3A30%3A00Z&SignatureMethod=HmacSHA256&SignatureVersion=2&Version=2012-11-05&Signature=0Iy50QIfQQAAb9JK59DGNgh8WdZwiwKK10RSiUefAAY%3D"
       end
     end
 

@@ -152,7 +152,7 @@ module SQS
 
     def sign_params(uri, opts)
       uri = URI.parse(uri) if uri.kind_of? String
-      opts = default_paramters.merge(opts)
+      opts = default_parameters.merge(opts)
 
       sorted_params = opts.sort {|x,y| x[0] <=> y[0]}
       encoded_params = sorted_params.collect do |p|
@@ -187,9 +187,9 @@ module SQS
       @regions
     end
 
-    def default_paramters
-      @default_paramters ||= PARAMETERS.merge("AWSAccessKeyId" => aws_key)
-      @default_paramters.merge("Expires" => (Time.now+(60*30)).utc.iso8601)
+    def default_parameters
+      @default_parameters ||= PARAMETERS.merge("AWSAccessKeyId" => aws_key)
+      @default_parameters.merge("Expires" => (Time.now+(60*30)).utc.iso8601)
     end
 
     def post_options
@@ -224,7 +224,7 @@ module SQS
 
 
     PARAMETERS = {
-      "Version" => "2009-02-01",
+      "Version" => "2012-11-05",
       "SignatureVersion"=>"2",
       "SignatureMethod"=>"HmacSHA256",
     }

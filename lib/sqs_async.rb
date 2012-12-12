@@ -1,5 +1,6 @@
 # Core extensions and global mixins
 require 'sqs_async/core_ext/hash'
+require 'sqs_async/core_ext/string'
 require 'sqs_async/sqs_utilities'
 
 # App classes and modules
