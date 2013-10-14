@@ -146,7 +146,7 @@ module SQS
 
     def on_failure(req, callbacks)
       result = (req.error != nil) ? req.error : req.response
-      log result
+      #log result
       callbacks[:failure].call(result) if callbacks[:failure]
     end
 
@@ -211,7 +211,7 @@ module SQS
       log_msg << "-".ljust(80, "-")
       log_msg << msg
       log_msg << "-".ljust(80, "-")
-      logger.error(log_msg.join("\n"))
+      #logger.error(log_msg.join("\n"))
     end
 
     REGIONS = {
